@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Malted Milk Balls - Interactive Claymation Stream">
+    <title>Claymation Mirror</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="title">The Claymation Mirror</h1>
+            <p class="subtitle">See yourself transformed in real-time through TouchDesigner</p>
+        </header>
+        
+        <main>
+            <section class="stream-section">
+                <div class="stream-info">
+                    <h2>Interactive Stream</h2>
+                    <div class="status-indicator" id="statusIndicator">
+                        <span class="status-dot"></span>
+                        <span id="statusText">Ready to connect</span>
+                    </div>
+                </div>
+                
+                <div class="video-grid">
+                    <div class="video-wrapper">
+                        <h3>Your Camera (OUT)</h3>
+                        <div class="video-container">
+                            <video id="localVideo" autoplay muted playsinline></video>
+                        </div>
+                        <p class="video-label">Streaming to TouchDesigner</p>
+                    </div>
+                    
+                    <div class="video-wrapper">
+                        <h3>Transformed (IN)</h3>
+                        <div class="video-container">
+                            <video id="remoteVideo" autoplay playsinline></video>
+                            <div class="video-overlay" id="videoOverlay">
+                                <p>Waiting for processed stream...</p>
+                            </div>
+                        </div>
+                        <p class="video-label">Processed by TouchDesigner</p>
+                    </div>
+                </div>
+                
+                <div class="stream-controls">
+                    <button class="btn btn-primary" id="joinBtn">Start Experience</button>
+                    <button class="btn btn-secondary" id="leaveBtn" style="display:none;">Leave</button>
+                </div>
+            </section>
+            
+            <section class="about-section">
+                <h2>About</h2>
+                <p>This is an interactive experience where your camera feed is processed in real-time through TouchDesigner and sent back to you as an abstracted artistic interpretation.</p>
+                <p><strong>Your Camera (OUT):</strong> Your live video and audio are sent to the TouchDesigner processing system.</p>
+                <p><strong>Transformed (IN):</strong> The processed, abstracted version streams back to you in real-time.</p>
+            </section>
+            
+            <section class="tech-section">
+                <h2>How It Works</h2>
+                <ul>
+                    <li><strong>Step 1:</strong> Allow camera and microphone access</li>
+                    <li><strong>Step 2:</strong> Your feed streams to TouchDesigner for live processing</li>
+                    <li><strong>Step 3:</strong> Watch your transformed self appear in the right panel</li>
+                    <li><strong>Technology:</strong> LiveKit WebRTC + TouchDesigner + Real-time Processing</li>
+                </ul>
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 The Claymation Mirror | Powered by LiveKit + TouchDesigner</p>
+        </footer>
+    </div>
+    
+    <script src="https://unpkg.com/livekit-client/dist/livekit-client.umd.min.js"></script>
+    <script src="stream.js"></script>
+</body>
+</html>
