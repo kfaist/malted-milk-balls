@@ -26,7 +26,8 @@ app.get("/api/participant-token", async (req, res) => {
       });
     }
     
-    const participantIdentity = `user-${Math.random().toString(36).substring(7)}`;
+    // Use fixed identity so both phone and video-only connect as same participant
+    const participantIdentity = 'claymation-user';
     const token = new AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET, {
       identity: participantIdentity,
       ttl: '2h',
