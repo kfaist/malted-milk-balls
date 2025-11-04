@@ -17,21 +17,42 @@
             height: 100%;
             object-fit: contain;
         }
+        #status {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #0f0;
+            font-family: monospace;
+            font-size: 14px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
+    <div id="status">Initializing...</div>
     <video id="remoteVideo" autoplay playsinline></video>
     
     <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.5.8/dist/livekit-client.umd.min.js"></script>
     <script>
         const remoteVideo = document.getElementById('remoteVideo');
+        const status = document.getElementById('status');
         let room = null;
+
+        function updateStatus(msg) {
+            status.textContent = msg;
+            console.log(msg);
+        }
 
         async function autoConnect() {
             try {
+                updateStatus('Fetching token...');
                 const response = await fetch('/api/participant-token');
                 const data = await response.json();
                 
+                updateStatus('Connecting to LiveKit...');
                 room = new LivekitClient.Room({
                     adaptiveStream: true,
                     dynacast: true
@@ -39,15 +60,22 @@
                 
                 room.on(LivekitClient.RoomEvent.TrackSubscribed, (track, publication, participant) => {
                     if (track.kind === LivekitClient.Track.Kind.Video) {
-                        console.log('Received video track');
+                        updateStatus(`Receiving video from: ${participant.identity}`);
                         const element = track.attach();
                         remoteVideo.srcObject = element.srcObject;
+                        // Hide status after 3 seconds of receiving video
+                        setTimeout(() => status.style.display = 'none', 3000);
                     }
                 });
                 
+                room.on(LivekitClient.RoomEvent.ParticipantConnected, (participant) => {
+                    updateStatus(`Participant joined: ${participant.identity}`);
+                });
+                
                 await room.connect(data.url, data.token);
-                console.log('Connected to LiveKit');
+                updateStatus('Connected! Waiting for video stream...');
             } catch (error) {
+                updateStatus('Error: ' + error.message);
                 console.error('Connection error:', error);
                 setTimeout(autoConnect, 5000);
             }
