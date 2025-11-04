@@ -1,5 +1,11 @@
 /* Malted Milk Balls - Interactive LiveKit Stream Client */
 
+// Check if LiveKit is loaded
+if (typeof LivekitClient === 'undefined') {
+    console.error('LiveKit client library not loaded!');
+    alert('Error loading LiveKit. Please refresh the page.');
+}
+
 let room = null;
 let isConnected = false;
 let localVideoTrack = null;
