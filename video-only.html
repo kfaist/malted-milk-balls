@@ -28,6 +28,7 @@
             padding: 10px;
             border-radius: 5px;
             z-index: 1000;
+            max-width: 400px;
         }
     </style>
 </head>
@@ -40,9 +41,12 @@
         const remoteVideo = document.getElementById('remoteVideo');
         const status = document.getElementById('status');
         let room = null;
+        let statusLog = [];
 
         function updateStatus(msg) {
-            status.textContent = msg;
+            statusLog.push(msg);
+            if (statusLog.length > 8) statusLog.shift();
+            status.innerHTML = statusLog.join('<br>');
             console.log(msg);
         }
 
@@ -58,24 +62,49 @@
                     dynacast: true
                 });
                 
-                room.on(LivekitClient.RoomEvent.TrackSubscribed, (track, publication, participant) => {
-                    if (track.kind === LivekitClient.Track.Kind.Video) {
-                        updateStatus(`Receiving video from: ${participant.identity}`);
-                        const element = track.attach();
-                        remoteVideo.srcObject = element.srcObject;
-                        // Hide status after 3 seconds of receiving video
-                        setTimeout(() => status.style.display = 'none', 3000);
-                    }
+                room.on(LivekitClient.RoomEvent.Connected, () => {
+                    updateStatus('✓ Connected to room!');
+                    updateStatus(`Participants: ${room.participants.size}`);
+                    
+                    // List existing participants
+                    room.participants.forEach((participant, identity) => {
+                        updateStatus(`Found: ${identity}`);
+                        // Subscribe to existing tracks
+                        participant.tracks.forEach((pub, trackSid) => {
+                            if (pub.track) {
+                                handleTrack(pub.track, participant);
+                            }
+                        });
+                    });
                 });
                 
                 room.on(LivekitClient.RoomEvent.ParticipantConnected, (participant) => {
-                    updateStatus(`Participant joined: ${participant.identity}`);
+                    updateStatus(`✓ ${participant.identity} joined`);
                 });
                 
+                room.on(LivekitClient.RoomEvent.TrackSubscribed, (track, publication, participant) => {
+                    updateStatus(`✓ Track from ${participant.identity}`);
+                    handleTrack(track, participant);
+                });
+                
+                room.on(LivekitClient.RoomEvent.TrackPublished, (publication, participant) => {
+                    updateStatus(`✓ ${participant.identity} published ${publication.kind}`);
+                });
+                
+                function handleTrack(track, participant) {
+                    if (track.kind === LivekitClient.Track.Kind.Video) {
+                        updateStatus(`📹 VIDEO from ${participant.identity}`);
+                        const element = track.attach();
+                        remoteVideo.srcObject = element.srcObject;
+                        // Hide status after video starts
+                        setTimeout(() => status.style.display = 'none', 5000);
+                    }
+                }
+                
                 await room.connect(data.url, data.token);
-                updateStatus('Connected! Waiting for video stream...');
+                
             } catch (error) {
-                updateStatus('Error: ' + error.message);
+                updateStatus('❌ Error: ' + error.message);
                 console.error('Connection error:', error);
                 setTimeout(autoConnect, 5000);
             }
