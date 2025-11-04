@@ -1,0 +1,57 @@
+🎯 QUICK OBS SETUP - DO THIS NOW!
+========================================
+
+IN OBS (you have it open already):
+
+1. CREATE SCENE
+   - Click "+" under Scenes (bottom left)
+   - Name: "Claymation-Live"
+   - Click OK
+
+2. ADD BROWSER SOURCE
+   - Click "+" under Sources (bottom middle)
+   - Choose "Browser"
+   - Name: "User-Camera-Browser"
+   - Click OK
+
+3. CONFIGURE BROWSER SOURCE
+   Copy these settings EXACTLY:
+
+   URL: https://malted-milk-balls.up.railway.app/auto-camera.html
+   (Check Railway dashboard for your exact URL!)
+
+   Width: 1280
+   Height: 720
+   FPS: 30
+
+   ✅ CHECK THESE BOXES:
+   ✅ Refresh browser when scene becomes active
+   ✅ Shutdown source when not visible
+
+   Click OK!
+
+4. POSITION THE SOURCE
+   - Drag/resize the browser source to fit your canvas
+   - Should show split-screen: left=user camera, right=processed
+
+5. TEST IT
+   - Visit your Railway URL in a regular browser
+   - Allow camera access
+   - You should see the camera feed in BOTH places:
+     * In your browser
+     * In OBS Browser Source
+
+========================================
+
+🔥 NEXT: Set up NDI Output
+- Add Filter to Browser Source → NDI Output
+- Name it "TouchDesigner"
+- Now TD can receive via NDI In TOP!
+
+========================================
+
+✅ DONE? Check that:
+- Browser source shows in OBS
+- User camera appears on left side
+- Right side says "Waiting for TouchDesigner..."
+- NDI is working (check TD receives feed)
