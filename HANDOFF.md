@@ -1,197 +1,236 @@
-# THE CLAYMATION MIRROR - COMPLETE HANDOFF
+# HANDOFF PROMPT - Claymation Mirror LiveKit + TouchDesigner Integration
 
-## 5-MINUTE CHECK-IN #2
-
-**Status:** COMPLETE and ready to deploy!
-
----
-
-## WHAT WE BUILT
-
-**The Claymation Mirror** - A two-way interactive LiveKit stream where:
-
-1. **User's camera/mic OUT** → Streams to TouchDesigner for processing
-2. **Processed video IN** ← TouchDesigner sends back abstracted animation
-
-It's like an artistic mirror that transforms you in real-time!
+## 🎯 PROJECT GOAL
+Create a real-time video processing loop:
+User Camera → LiveKit → TouchDesigner (processing) → LiveKit → User sees transformed video
 
 ---
 
-## PROJECT FILES (All Complete)
+## ✅ WHAT'S WORKING
 
-Location: `C:\Users\krista-showputer\Desktop\malted-milk-balls\`
+1. **Web Application (Railway)**
+   - URL: https://malted-milk-balls-production.up.railway.app/
+   - User can connect via phone/browser
+   - Camera publishing TO LiveKit works perfectly
+   - User sees their own camera feed
 
-### Core Files ✅
-- `index.html` - Two-portal layout (OUT/IN)
-- `styles.css` - Beautiful black/green Mirror's Echo styling
-- `stream.js` - Bidirectional LiveKit client (publishes camera, receives processed video)
-- `server.js` - Participant token generation (can publish AND subscribe)
-- `package.json` - Dependencies
+2. **TouchDesigner**
+   - NDI output is working
+   - Processing pipeline ready
+   - Running on local machine
 
-### Deployment Files ✅
-- `railway.json` - Railway configuration
-- `.gitignore` - Git ignore rules
-- `README.md` - Project documentation
-- `RAILWAY-DEPLOY.md` - Step-by-step deployment guide
+3. **GitHub Repository**
+   - Repo: https://github.com/kfaist/malted-milk-balls
+   - Auto-deploys to Railway on push to main branch
+   - Located locally at: C:\Users\krista-showputer\Desktop\malted-milk-balls
 
 ---
 
-## HOW IT WORKS
+## ❌ CURRENT PROBLEM
 
-### User Flow:
-1. User visits site
-2. Clicks "Start Experience"
-3. Allows camera/microphone
-4. **LEFT panel**: Shows their camera (streaming OUT to TouchDesigner)
-5. **RIGHT panel**: Shows processed video (streaming IN from TouchDesigner)
+**The video-only page (for OBS/TouchDesigner) shows BLACK SCREEN**
 
-### Technical Flow:
+The page at `/video-only.html` is supposed to receive the user's camera stream from LiveKit, but it's not displaying video even though:
+- The user's phone shows their camera working fine
+- The LiveKit connection succeeds
+- Debug shows "Connected to room!"
+
+**The issue:** When video-only.html connects, it needs to find and subscribe to EXISTING video tracks that were published BEFORE it joined. The current code handles NEW tracks but not existing ones.
+
+**Last push:** Added code to check `room.remoteParticipants` after connecting, but this hasn't been deployed/tested yet.
+
+---
+
+## 🔑 CREDENTIALS
+
+### LiveKit Cloud
 ```
-User Camera → LiveKit Cloud → TouchDesigner
-         ↓
-TouchDesigner processes video
-         ↓
-TouchDesigner → LiveKit Cloud → User sees transformed self
+URL: wss://claymation-transcription-l6e51sws.livekit.cloud
+API Key: APITw2Yp2Tv3yfg
+API Secret: eVYY0UB69XDGLiGzclYuGUhXuVpc8ry3YcazimFryDW
+Room Name: claymation-live
 ```
 
----
-
-## DEPLOYMENT TO RAILWAY (NEW PROJECT)
-
-### Quick Deploy:
-```bash
-cd C:\Users\krista-showputer\Desktop\malted-milk-balls
-
-# Create GitHub repo
-git init
-git add .
-git commit -m "Initial commit: Claymation Mirror"
-
-# Push to GitHub (create repo first at github.com/new)
-git remote add origin https://github.com/kfaist/malted-milk-balls.git
-git branch -M main
-git push -u origin main
+### Railway Environment Variables (already set)
 ```
-
-Then:
-1. Go to https://railway.com
-2. Click "New Project" → "Deploy from GitHub"
-3. Select `malted-milk-balls`
-4. Add these environment variables:
-   - `LIVEKIT_API_KEY` = `APITw2Yp2Tv3yfg`
-   - `LIVEKIT_API_SECRET` = `eVYY0UB69XDGLiGzclYuGUhXuVpc8ry3YcazimFryDW`
-   - `LIVEKIT_URL` = `wss://claymation-transformation-uxcmrb4f.livekit.cloud`
-   - `LIVEKIT_ROOM_NAME` = `claymation-live`
-5. Generate public domain
-6. Done!
-
-See `RAILWAY-DEPLOY.md` for detailed instructions.
-
----
-
-## TOUCHDESIGNER SETUP
-
-You'll need to connect TouchDesigner to receive the user's camera and send back processed video.
-
-### In TouchDesigner:
-1. Use LiveKit components to connect to room `claymation-live`
-2. Subscribe to incoming video/audio tracks (user's camera)
-3. Process in real-time
-4. Publish processed video back to LiveKit
-5. Users will see it in their "Transformed (IN)" panel
-
----
-
-## TEST LOCALLY FIRST
-
-```bash
-cd C:\Users\krista-showputer\Desktop\malted-milk-balls
-
-# Install
-npm install
-
-# Set env vars (PowerShell)
-$env:LIVEKIT_API_KEY="APITw2Yp2Tv3yfg"
-$env:LIVEKIT_API_SECRET="eVYY0UB69XDGLiGzclYuGUhXuVpc8ry3YcazimFryDW"
-$env:LIVEKIT_URL="wss://claymation-transformation-uxcmrb4f.livekit.cloud"
-$env:LIVEKIT_ROOM_NAME="claymation-live"
-
-# Start
-npm start
-
-# Visit: http://localhost:3000
+LIVEKIT_API_KEY=APITw2Yp2Tv3yfg
+LIVEKIT_API_SECRET=eVYY0UB69XDGLiGzclYuGUhXuVpc8ry3YcazimFryDW
+LIVEKIT_URL=wss://claymation-transcription-l6e51sws.livekit.cloud
+LIVEKIT_ROOM_NAME=claymation-live
 ```
 
 ---
 
-## FILES SUMMARY
+## 📁 KEY FILES
 
-**Frontend (What users see):**
-- Beautiful two-portal layout
-- Left: User's camera (OUT)
-- Right: Processed video (IN)
-- Status indicators
-- Clean controls
+### Main Application
+- `index.html` - Main user interface (works!)
+- `stream.js` - Handles camera capture and LiveKit connection
+- `video-only.html` - OBS/TD viewer (NEEDS FIX)
+- `server.js` - Express server, serves static files, generates LiveKit tokens
+- `styles.css` - Styling
 
-**Backend:**
-- Express server
-- Generates participant tokens (can publish + subscribe)
-- Serves static files
-
-**LiveKit Integration:**
-- User publishes camera/mic → TouchDesigner receives
-- TouchDesigner publishes processed video → User receives
-- All in room: `claymation-live`
+### Server Endpoints
+- `GET /` - Main page
+- `GET /video-only.html` - Video-only viewer for OBS
+- `GET /api/participant-token` - Generates LiveKit access token
 
 ---
 
-## NEXT STEPS
+## 🏗️ ARCHITECTURE
 
-1. ✅ Deploy to Railway (follow RAILWAY-DEPLOY.md)
-2. 🔧 Connect TouchDesigner to LiveKit room
-3. 🎨 Process user video in TouchDesigner
-4. 📡 Publish processed video back to LiveKit
-5. 🎉 Users see their transformed selves!
-
----
-
-## TROUBLESHOOTING
-
-**User sees only their camera, no processed video:**
-- TouchDesigner needs to be connected and publishing
-
-**Camera access denied:**
-- User needs to allow camera/microphone in browser
-
-**Connection fails:**
-- Check Railway environment variables are set correctly
-
----
-
-## CREDENTIALS
-
-**LiveKit Cloud:**
-- Room: `claymation-live`
-- API Key: `APITw2Yp2Tv3yfg`
-- API Secret: `eVYY0UB69XDGLiGzclYuGUhXuVpc8ry3YcazimFryDW`
-- URL: `wss://claymation-transformation-uxcmrb4f.livekit.cloud`
-
-**Railway:**
-- New project (not yet deployed)
-- Will generate domain after deployment
-
-**GitHub:**
-- Repo: https://github.com/kfaist/malted-milk-balls (create this)
+```
+┌─────────────────┐
+│  User's Phone   │
+│   (Browser)     │
+└────────┬────────┘
+         │ Publishes video
+         ▼
+┌─────────────────┐
+│   LiveKit Room  │
+│ "claymation-    │
+│      live"      │
+└────────┬────────┘
+         │ Should receive video but doesn't
+         ▼
+┌─────────────────┐
+│  video-only.html│ ◄── BROKEN
+│   (in OBS)      │
+└────────┬────────┘
+         │ NDI Out
+         ▼
+┌─────────────────┐
+│  TouchDesigner  │
+│   (Processing)  │
+│   NDI In/Out    │ ◄── WORKING
+└────────┬────────┘
+         │ Need to send back
+         ▼
+    LiveKit Room
+         │
+         ▼
+   User sees result
+```
 
 ---
 
-## PROJECT COMPLETE! 🎉
+## 🔧 IMMEDIATE NEXT STEPS
 
-**Status: 100% Ready for Deployment**
+1. **Push the latest fix to GitHub:**
+   ```bash
+   cd C:\Users\krista-showputer\Desktop\malted-milk-balls
+   git add video-only.html
+   git commit -m "Fix: Check for existing tracks on connection"
+   git push
+   ```
 
-All files are complete and working. Just need to:
-1. Push to GitHub
-2. Deploy to Railway
-3. Connect TouchDesigner
+2. **Wait 2 minutes for Railway to deploy**
 
-You have a beautiful, working two-way interactive stream!
+3. **Test the fix:**
+   - Connect phone to main page first
+   - Then refresh OBS browser source with video-only.html
+   - Check debug overlay - should say "Found: user-xxxxx"
+   - Video should appear
+
+4. **If still broken, try alternative approach:**
+   - Use LiveKit's `room.on('trackPublished')` event
+   - Or manually iterate through `participant.audioTracks` and `participant.videoTracks`
+   - Or subscribe explicitly with `participant.setTrackEnabled()`
+
+---
+
+## 🐛 DEBUGGING
+
+### Check deployment logs:
+Railway → malted-milk-balls service → View logs
+
+### Test in browser console:
+```javascript
+// On video-only.html page
+console.log('Room:', room);
+console.log('Remote participants:', room.remoteParticipants);
+room.remoteParticipants.forEach((p, identity) => {
+    console.log('Participant:', identity);
+    console.log('Tracks:', p.trackPublications);
+});
+```
+
+### Common issues:
+- Token expired (server generates fresh ones each time)
+- Wrong room name (should be "claymation-live")
+- Tracks not subscribed (check `publication.subscribed`)
+- Video element not attaching properly
+
+---
+
+## 📚 REFERENCE DOCS
+
+- LiveKit JS SDK: https://docs.livekit.io/client-sdk-js/
+- Tutorial we used: https://derivative.ca/community-post/tutorial/irl-stream-touchdesigner/65038
+- LiveKit Room events: https://docs.livekit.io/client-sdk-js/classes/Room.html
+
+---
+
+## 🎨 TOUCHDESIGNER INTEGRATION (TODO)
+
+Once video-only.html works in OBS:
+
+1. **OBS receives video** from video-only.html
+2. **OBS outputs to NDI** (using obs-ndi plugin)
+3. **TouchDesigner receives** via NDI In TOP
+4. **Process video** (effects/claymation)
+5. **TouchDesigner outputs** via NDI Out TOP (WORKING)
+6. **Need to bridge NDI → LiveKit** to complete the loop
+
+Options for step 6:
+- OBS captures NDI from TD, uses LiveKit output
+- Python script using livekit-api to publish from NDI
+- Custom Node.js script with livekit-server-sdk
+
+---
+
+## 💡 ALTERNATIVE SOLUTIONS
+
+If video-only.html continues to have issues:
+
+### Option A: Direct WebRTC in OBS
+Use OBS Browser Source to load the main page, but crop/hide everything except the video
+
+### Option B: NDI Bridge Both Ways
+- User → NDI Webcam Chrome extension → TD
+- TD → NDI Out → OBS → LiveKit
+
+### Option C: Python LiveKit SDK in TouchDesigner
+Write Python CHOP/DAT in TD to connect directly to LiveKit using livekit-api
+
+---
+
+## 📞 WHERE WE LEFT OFF
+
+User said: "it would snap a still of me now its just black but video feed showing myself on my phone is fine"
+
+Meaning:
+- Phone camera feed works
+- Video-only.html used to show a still frame briefly
+- Now shows black screen
+- Just pushed fix to check for existing remote participants
+- Needs testing after Railway deployment
+
+**The fix is in the latest commit, needs to be deployed and tested.**
+
+---
+
+## 🚀 TO RESUME
+
+Say: "I'm continuing the Claymation Mirror LiveKit project. The video-only.html page shows black screen in OBS even though the user's phone camera is working. Last step was pushing a fix to check for existing remote participants. Can you help me test if the latest deployment fixed it?"
+
+The assistant should:
+1. Check if Railway deployed the latest commit
+2. Test video-only.html with phone already connected
+3. If still broken, debug the LiveKit track subscription
+4. Get video displaying in OBS
+5. Then work on completing the loop back to LiveKit
+
+---
+
+END OF HANDOFF
