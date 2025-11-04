@@ -27,7 +27,19 @@ let obsConnected = false;
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
+// Redirect root to auto-camera page
+app.get("/", (_req, res) => res.redirect("/auto-camera.html"));
+
 app.get("/healthz", (_req, res) => res.status(200).send("ok"));
+
+// Legacy endpoint - redirects to new system
+app.get("/api/participant-token", (_req, res) => {
+  res.status(410).json({
+    error: 'This endpoint has been replaced',
+    message: 'Please use /auto-camera.html for the new auto-camera system',
+    redirect: '/auto-camera.html'
+  });
+});
 
 // Endpoint to notify when user connects
 app.post("/api/user-connected", async (req, res) => {
