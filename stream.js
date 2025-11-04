@@ -1,9 +1,19 @@
 /* Malted Milk Balls - Interactive LiveKit Stream Client */
 
-// Check if LiveKit is loaded
-if (typeof LivekitClient === 'undefined') {
-    console.error('LiveKit client library not loaded!');
-    alert('Error loading LiveKit. Please refresh the page.');
+// Wait for LiveKit to load
+function waitForLiveKit() {
+    if (typeof LivekitClient !== 'undefined') {
+        initializeApp();
+    } else {
+        console.log('Waiting for LiveKit to load...');
+        setTimeout(waitForLiveKit, 100);
+    }
+}
+
+// Initialize after LiveKit is loaded
+function initializeApp() {
+    console.log('LiveKit loaded successfully!');
+    setupEventListeners();
 }
 
 let room = null;
@@ -146,13 +156,22 @@ async function leaveStream() {
     updateStatus('Ready to connect', 'ready');
 }
 
-// Event listeners
-joinBtn.addEventListener('click', joinStream);
-leaveBtn.addEventListener('click', leaveStream);
+// Setup event listeners
+function setupEventListeners() {
+    joinBtn.addEventListener('click', joinStream);
+    leaveBtn.addEventListener('click', leaveStream);
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        if (room) {
+            room.disconnect();
+        }
+    });
+}
 
-// Cleanup on page unload
-window.addEventListener('beforeunload', () => {
-    if (room) {
-        room.disconnect();
-    }
-});
+// Start the app when page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', waitForLiveKit);
+} else {
+    waitForLiveKit();
+}
